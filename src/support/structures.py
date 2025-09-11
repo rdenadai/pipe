@@ -1,12 +1,9 @@
-from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
-from collections.abc import Set as _Set
+from collections.abc import Iterator, Sequence
 from functools import partial
-from typing import Any
+from typing import Any, Callable
 
 from src.pipe import pipe
-from src.support.utils import from_generator, materialize
-
-STRUCTURAL_TYPES = (Sequence, Iterator, Mapping, _Set, ItemsView)
+from src.support.utils import STRUCTURAL_TYPES, create_converter, from_generator, materialize
 
 Parcial = lambda func, *args, **kwargs: pipe(partial(func, *args, **kwargs))
 Print = pipe(print)
@@ -18,42 +15,22 @@ def to_value(data: Any) -> Any:
 
 
 class List:
-    @materialize
-    @staticmethod
-    def to_value(data: Any) -> list:
-        if isinstance(data, Generator):
-            data = from_generator(data)
-        if isinstance(data, list):
-            return data
-        elif not isinstance(data, STRUCTURAL_TYPES):
-            return [data]
-        return list(data)
+    to_value = create_converter(list, lambda data: [data] if not isinstance(data, STRUCTURAL_TYPES) else list(data))
 
 
 class Dict:
-    @materialize
-    @staticmethod
-    def to_value(data: Any) -> dict:
-        data = from_generator(data)
-        if isinstance(data, dict):
-            return data
-        elif isinstance(data, (Sequence, Iterator)):
-            return dict(data)
-        else:
-            return {data: data}
+    to_value = create_converter(
+        dict,
+        lambda data: dict(data) if isinstance(data, (Sequence, Iterator)) else {data: data},
+    )
 
 
 class Set:
-    @materialize
-    @staticmethod
-    def to_value(data: Any) -> set:
-        if isinstance(data, Generator):
-            data = from_generator(data)
-        if isinstance(data, set):
-            return data
-        elif not isinstance(data, STRUCTURAL_TYPES):
-            return {data}
-        return set(data)
+    to_value = create_converter(set)
+
+
+class Tuple:
+    to_value = create_converter(tuple, lambda data: (data,) if not isinstance(data, STRUCTURAL_TYPES) else tuple(data))
 
 
 class String:
@@ -62,15 +39,18 @@ class String:
     def to_value(data: Any) -> str:
         return str(from_generator(data))
 
-
-class Tuple:
-    @materialize
     @staticmethod
-    def to_value(data: Any) -> tuple:
-        if isinstance(data, Generator):
-            data = from_generator(data)
-        if isinstance(data, tuple):
-            return data
-        elif not isinstance(data, STRUCTURAL_TYPES):
-            return (data,)
-        return tuple(data)
+    def _proxy_str_method(method_name: str) -> Callable[..., Any]:
+        @materialize
+        def method(data: Any, *args: Any, **kwargs: Any) -> Any:
+            s = str(from_generator(data))
+            return getattr(s, method_name)(*args, **kwargs)
+
+        return method
+
+    upper = _proxy_str_method("upper")
+    lower = _proxy_str_method("lower")
+    capitalize = _proxy_str_method("capitalize")
+    title = _proxy_str_method("title")
+    strip = _proxy_str_method("strip")
+    split = _proxy_str_method("split")
