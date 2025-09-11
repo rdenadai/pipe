@@ -45,3 +45,15 @@ def test_tuple_pipe_with_partial():
 
     result = 3 >> add_one >> multiply_by_two >> Tuple.to_value
     assert result == (8,)
+
+
+def test_tuple_pipe_function_with_multiple_arguments():
+    data = {"fruits": (("apple", 5), ("banana", 3), ("cherry", 7)), "vegetables": (("carrot", 4), ("broccoli", 6))}
+
+    @pipe
+    def extract_names(item: dict[str, tuple[tuple[str, int], ...]]) -> tuple[str]:
+        return tuple((name for category in item.values() for name, _ in category))
+
+    result = data >> extract_names >> Tuple.to_value
+    assert result == ("apple", "banana", "cherry", "carrot", "broccoli")
+    assert isinstance(result, tuple)
