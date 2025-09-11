@@ -1,9 +1,9 @@
 from collections.abc import Iterator, Sequence
 from functools import partial
-from typing import Any, Callable
+from typing import Any
 
 from src.pipe import pipe
-from src.support.utils import STRUCTURAL_TYPES, create_converter, from_generator, materialize
+from src.support.utils import STRUCTURAL_TYPES, create_converter, from_generator, materialize, proxy_str_method
 
 Parcial = lambda func, *args, **kwargs: pipe(partial(func, *args, **kwargs))
 Print = pipe(print)
@@ -39,18 +39,9 @@ class String:
     def to_value(data: Any) -> str:
         return str(from_generator(data))
 
-    @staticmethod
-    def _proxy_str_method(method_name: str) -> Callable[..., Any]:
-        @materialize
-        def method(data: Any, *args: Any, **kwargs: Any) -> Any:
-            s = str(from_generator(data))
-            return getattr(s, method_name)(*args, **kwargs)
-
-        return method
-
-    upper = _proxy_str_method("upper")
-    lower = _proxy_str_method("lower")
-    capitalize = _proxy_str_method("capitalize")
-    title = _proxy_str_method("title")
-    strip = _proxy_str_method("strip")
-    split = _proxy_str_method("split")
+    upper = proxy_str_method("upper")
+    lower = proxy_str_method("lower")
+    capitalize = proxy_str_method("capitalize")
+    title = proxy_str_method("title")
+    strip = proxy_str_method("strip")
+    split = proxy_str_method("split")
