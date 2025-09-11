@@ -1,4 +1,4 @@
-from collections.abc import ItemsView, Iterator, Mapping, Sequence
+from collections.abc import Generator, ItemsView, Iterator, Mapping, Sequence
 from collections.abc import Set as _Set
 from functools import partial
 from typing import Any
@@ -21,6 +21,8 @@ class List:
     @materialize
     @staticmethod
     def to_value(data: Any) -> list:
+        if isinstance(data, Generator):
+            data = from_generator(data)
         if isinstance(data, list):
             return data
         elif not isinstance(data, STRUCTURAL_TYPES):
@@ -45,6 +47,8 @@ class Set:
     @materialize
     @staticmethod
     def to_value(data: Any) -> set:
+        if isinstance(data, Generator):
+            data = from_generator(data)
         if isinstance(data, set):
             return data
         elif not isinstance(data, STRUCTURAL_TYPES):
@@ -63,6 +67,8 @@ class Tuple:
     @materialize
     @staticmethod
     def to_value(data: Any) -> tuple:
+        if isinstance(data, Generator):
+            data = from_generator(data)
         if isinstance(data, tuple):
             return data
         elif not isinstance(data, STRUCTURAL_TYPES):

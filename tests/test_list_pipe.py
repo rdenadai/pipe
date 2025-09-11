@@ -114,3 +114,15 @@ def test_list_pipe_partial_function():
 
     result = 3 >> multiply_by_3 >> List.to_value
     assert result == [9]
+
+
+def test_tuple_pipe_function_with_multiple_arguments():
+    data = {"fruits": (("apple", 5), ("banana", 3), ("cherry", 7)), "vegetables": (("carrot", 4), ("broccoli", 6))}
+
+    @pipe
+    def extract_names(item: dict[str, tuple[tuple[str, int], ...]]) -> list[str]:
+        return list((name for category in item.values() for name, _ in category))
+
+    result = data >> extract_names >> List.to_value
+    assert result == ["apple", "banana", "cherry", "carrot", "broccoli"]
+    assert isinstance(result, list)
