@@ -3,11 +3,11 @@ name = "pipe"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11.11"
+requires-python = ">=3.9"
 dependencies = []
 
 [dependency-groups]
-dev = [
-    "pytest>=8.4.2",
-    "ruff>=0.12.12",
-]
+dev = ["pytest>=8.4.2", "ruff>=0.12.12"]
+
+[tool.ruff]
+line-length = 120
