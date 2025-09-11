@@ -116,7 +116,7 @@ def test_list_pipe_partial_function():
     assert result == [9]
 
 
-def test_tuple_pipe_function_with_multiple_arguments():
+def test_list_pipe_function_with_multiple_arguments():
     data = {"fruits": (("apple", 5), ("banana", 3), ("cherry", 7)), "vegetables": (("carrot", 4), ("broccoli", 6))}
 
     @pipe
