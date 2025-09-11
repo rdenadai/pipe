@@ -1,6 +1,6 @@
 from collections.abc import Callable, Generator, ItemsView, Iterator, Mapping, Sequence
 from collections.abc import Set as _Set
-from typing import Any, Type, TypeVar
+from typing import Any, Optional, Type, TypeVar
 
 from src.pipe import pipe
 
@@ -25,7 +25,7 @@ def from_generator(data: Any) -> Any:
     return data
 
 
-def create_converter(target_type: Type[T], special_logic: Callable[[Any], T] | None = None) -> Callable[[Any], T]:
+def create_converter(target_type: Type[T], special_logic: Optional[Callable[[Any], T]] = None) -> Callable[[Any], T]:
     """Factory to create 'to_value' conversion methods."""
 
     @materialize
