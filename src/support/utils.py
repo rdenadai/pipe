@@ -41,3 +41,16 @@ def create_converter(target_type: Type[T], special_logic: Optional[Callable[[Any
         return target_type(data)  # type: ignore
 
     return to_value
+
+
+def proxy_str_method(method_name: str, sep: Optional[str] = None) -> Callable[..., Any]:
+    @materialize
+    def method(data: Any, *args: Any, **kwargs: Any) -> Any:
+        data = from_generator(data)
+        if isinstance(data, str):
+            return getattr(data, method_name)(*args, **kwargs)
+        elif isinstance(data, STRUCTURAL_TYPES):
+            return [getattr(s, method_name)(*args, **kwargs) for s in data if isinstance(s, str)]
+        return getattr(data, method_name)(*args, **kwargs)
+
+    return method
