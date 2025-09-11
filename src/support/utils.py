@@ -1,9 +1,6 @@
-from collections.abc import Callable, Generator
-from typing import Any, Callable, Type, TypeVar
-from collections.abc import ItemsView, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, ItemsView, Iterator, Mapping, Sequence
 from collections.abc import Set as _Set
-from functools import partial
-from typing import Any, Callable, Type, TypeVar
+from typing import Any, Type, TypeVar
 
 from src.pipe import pipe
 
